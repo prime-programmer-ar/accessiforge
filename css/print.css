@@ -1,0 +1,42 @@
+/* ==========================================================================
+   AccessiForge — Print stylesheet
+   Prints the audit report cleanly; hides app chrome and interactive-only UI.
+   ========================================================================== */
+
+@media print {
+  .site-header,
+  .site-footer,
+  .skip-link,
+  [role="tablist"],
+  .noprint,
+  .toast,
+  .hero-chips,
+  .quick-nav,
+  .steps {
+    display: none !important;
+  }
+
+  /* Only the open panel prints */
+  [role="tabpanel"][hidden] { display: none !important; }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .card,
+  .stat,
+  fieldset,
+  dialog {
+    box-shadow: none !important;
+    border-color: #666 !important;
+    break-inside: avoid;
+  }
+
+  a { color: #000; text-decoration: underline; }
+
+  .report-out { max-height: none; overflow: visible; }
+
+  main { padding: 0; }
+}

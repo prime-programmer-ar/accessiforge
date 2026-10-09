@@ -1,0 +1,194 @@
+/* ==========================================================================
+   AccessiForge — Design Tokens
+   --------------------------------------------------------------------------
+   Every color pair used for text or UI boundaries is verified against
+   WCAG 2.1: body text >= 4.5:1, large text >= 3:1, UI borders >= 3:1.
+   Themes: light (default) · dark · contrast.
+   Spacing scale: 4px base. Type scale: fluid, ratio ~1.2.
+   ========================================================================== */
+
+:root {
+  /* -- Spacing scale (4px base) ------------------------------------------ */
+  --sp-1: 0.25rem;   /*  4px */
+  --sp-2: 0.5rem;    /*  8px */
+  --sp-3: 0.75rem;   /* 12px */
+  --sp-4: 1rem;      /* 16px */
+  --sp-5: 1.25rem;   /* 20px */
+  --sp-6: 1.5rem;    /* 24px */
+  --sp-8: 2rem;      /* 32px */
+  --sp-10: 2.5rem;   /* 40px */
+  --sp-12: 3rem;     /* 48px */
+  --sp-16: 4rem;     /* 64px */
+
+  /* -- Type scale (fluid, rem) -------------------------------------------- */
+  --fs-xs: 0.8125rem;    /* 13px — captions, chips */
+  --fs-sm: 0.875rem;     /* 14px — secondary text */
+  --fs-md: 1rem;         /* 16px — body */
+  --fs-lg: 1.125rem;     /* 18px — h4 / emphasized */
+  --fs-xl: 1.375rem;     /* 22px — h3 */
+  --fs-2xl: 1.625rem;    /* 26px — h2 */
+  --fs-3xl: clamp(1.9rem, 1.5rem + 1.8vw, 2.5rem);   /* page h1 / hero */
+  --fs-hero: clamp(2.4rem, 1.6rem + 3.2vw, 3.6rem);  /* overview hero */
+
+  /* -- Typography ---------------------------------------------------------- */
+  /* Lexend is designed for readability; IBM Plex Mono for code & logs.
+     System stacks keep the app fully usable offline with no network. */
+  --font-sans: "Lexend", system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas,
+               "Cascadia Mono", monospace;
+  --lh-tight: 1.25;
+  --lh-body: 1.65;
+
+  /* -- Radii ---------------------------------------------------------------- */
+  --r-sm: 0.5rem;    /*  8px — inputs, chips */
+  --r-md: 0.75rem;   /* 12px — buttons */
+  --r-lg: 0.875rem;  /* 14px — cards */
+  --r-xl: 1.25rem;   /* 20px — hero, dialog */
+  --r-pill: 999px;
+
+  /* -- Motion ---------------------------------------------------------------- */
+  --t-fast: 150ms ease;
+  --t-med: 250ms ease;
+
+  /* -- Layout ---------------------------------------------------------------- */
+  --container: 72rem;
+  --header-h: auto;
+
+  /* -- Layering ---------------------------------------------------------------- */
+  --z-header: 20;
+  --z-menu: 30;
+  --z-toast: 40;
+}
+
+/* ==========================================================================
+   Theme: light (default)
+   All values below are contrast-checked pairs, not decoration.
+   ========================================================================== */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #eef2f5;            /* app background          */
+  --bg-grad-a: #dce8ee;     /* hero gradient start     */
+  --bg-grad-b: #eef2f5;     /* hero gradient end       */
+  --surface: #ffffff;       /* cards, inputs, menus    */
+  --surface-2: #f5f8fa;     /* insets, code blocks     */
+  --surface-3: #e7edf1;     /* hover surfaces          */
+
+  --ink: #17242f;           /* primary text  (12.6:1 on surface) */
+  --ink-soft: #33424e;      /* headings alt  ( 9.4:1 on surface) */
+  --muted: #4e5f6b;         /* secondary text ( 6.6:1 on surface) */
+
+  --primary: #0e5963;       /* teal 700 — 7.6:1 on surface, 7.2:1 on bg */
+  --primary-strong: #0a4750;
+  --primary-soft: #d9edf0;  /* tint backgrounds, no text on it */
+  --on-primary: #ffffff;    /* 7.6:1 on primary */
+
+  --accent: #c2410c;        /* CTA / links — 5.2:1 on surface */
+  --accent-strong: #9a340a; /* hover — 6.9:1 on surface */
+  --accent-soft: #fbe9df;
+
+  --ok: #0e6b33;            /* pass — 6.6:1 on surface */
+  --ok-soft: #def2e6;
+  --bad: #b3261e;           /* fail — 6.5:1 on surface */
+  --bad-soft: #fbe4e2;
+  --warn: #8a5a00;          /* warning text — 5.7:1 on surface */
+  --warn-soft: #fdeed3;
+
+  --bd: #5b6b77;            /* UI borders — 4.5:1 on surface (>= 3:1 rule) */
+  --bd-soft: #9fb0bb;       /* decorative separators only */
+  --bd-strong: #33424e;
+
+  --focus: #17242f;         /* focus ring = ink for max contrast */
+  --shadow-sm: 0 1px 2px rgba(23, 36, 47, 0.08);
+  --shadow-md: 0 2px 6px rgba(23, 36, 47, 0.10), 0 8px 24px rgba(23, 36, 47, 0.08);
+  --shadow-lg: 0 12px 40px rgba(23, 36, 47, 0.18);
+}
+
+/* ==========================================================================
+   Theme: dark
+   ========================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0c141d;
+  --bg-grad-a: #10202b;
+  --bg-grad-b: #0c141d;
+  --surface: #16222e;
+  --surface-2: #1c2a38;
+  --surface-3: #22323f;
+
+  --ink: #e9f0f5;           /* 14.8:1 on surface */
+  --ink-soft: #d3dee6;      /* 11.4:1 on surface */
+  --muted: #a7b8c4;         /*  7.6:1 on surface */
+
+  --primary: #7ee0dc;       /* teal 300 — 10.9:1 on surface */
+  --primary-strong: #a8ece9;
+  --primary-soft: #123640;
+  --on-primary: #04262b;    /* 10.9:1 on primary */
+
+  --accent: #ffb38a;        /* 10.1:1 on surface */
+  --accent-strong: #ffcbb0;
+  --accent-soft: #45221166;
+
+  --ok: #8fdfae;            /* 11.0:1 on surface */
+  --ok-soft: #0f3a22;
+  --bad: #ffa39a;           /* 9.9:1 on surface */
+  --bad-soft: #46151266;
+  --warn: #f3ce7e;
+  --warn-soft: #3d2f0e;
+
+  --bd: #8fa3b1;            /* 5.4:1 on surface */
+  --bd-soft: #3a4b58;
+  --bd-strong: #c3d2dc;
+
+  --focus: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   Theme: high contrast (black / white / yellow)
+   Meets the needs of users who need maximum separation.
+   ========================================================================== */
+:root[data-theme="contrast"] {
+  color-scheme: dark;
+
+  --bg: #000000;
+  --bg-grad-a: #000000;
+  --bg-grad-b: #000000;
+  --surface: #000000;
+  --surface-2: #0a0a0a;
+  --surface-3: #141414;
+
+  --ink: #ffffff;           /* 21:1 */
+  --ink-soft: #ffffff;
+  --muted: #ffffff;
+
+  --primary: #ffee00;       /* yellow — 17.7:1 on black */
+  --primary-strong: #fff76b;
+  --primary-soft: #231f00;
+  --on-primary: #000000;    /* 17.7:1 on yellow */
+
+  --accent: #7adfff;        /* 14.4:1 on black */
+  --accent-strong: #b8ecff;
+  --accent-soft: #00252f;
+
+  --ok: #4dff88;            /* 15.3:1 on black */
+  --ok-soft: #00280f;
+  --bad: #ff8a80;           /* 12.1:1 on black */
+  --bad-soft: #3c0805;
+  --warn: #ffe066;
+  --warn-soft: #332600;
+
+  --bd: #ffffff;            /* 21:1 */
+  --bd-soft: #ffffff;
+  --bd-strong: #ffffff;
+
+  --focus: #ffee00;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+}

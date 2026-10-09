@@ -1,0 +1,692 @@
+<!doctype html>
+<!-- lang is set so screen readers pick the right pronunciation (SC 3.1.1) -->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="AccessiForge — a zero-dependency WCAG 2.1 training lab: keyboard and ARIA practice, contrast and magnification testing, a remediation workshop and an audit report builder.">
+<title>AccessiForge — WCAG 2.1 accessibility lab</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/modules.css">
+<link rel="stylesheet" href="css/print.css">
+<script>
+/* Theme bootstrap — runs before first paint to avoid a flash of the wrong
+   theme. Priority: saved choice > OS preference > light. */
+(function () {
+  try {
+    var t = null;
+    try { t = JSON.parse(localStorage.getItem("accessiforge:theme")); } catch (e) {}
+    if (!t || ["light", "dark", "contrast"].indexOf(t) < 0) {
+      t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    document.documentElement.setAttribute("data-theme", t);
+  } catch (e) { /* keep default */ }
+})();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ================= Header ================= -->
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#overview" aria-label="AccessiForge — home module">
+      <svg class="brand-mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="44" height="44" rx="12"/>
+        <circle cx="24" cy="13.5" r="4" fill="currentColor" stroke="none"/>
+        <path d="M11 21c4.3 2.2 8.6 3.3 13 3.3S32.7 23.2 37 21" stroke-linecap="round"/>
+        <path d="M24 24.5V32" stroke-linecap="round"/>
+        <path d="M24 32l-7 10M24 32l7 10" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">AccessiForge</span>
+        <span class="brand-tag">WCAG 2.1 lab</span>
+      </span>
+    </a>
+    <div class="header-actions">
+      <label class="row" style="gap:.5rem">
+        <span class="sr-only">Theme</span>
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+        <select id="themeSelect" data-theme-select>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="contrast">High contrast</option>
+        </select>
+      </label>
+      <button type="button" class="btn btn-secondary btn-sm" id="helpBtn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.6 2.24c-.75.37-1.2.85-1.2 1.76v.25"/><circle cx="12" cy="17" r=".4" fill="currentColor"/></svg>
+        <span class="btn-label">Shortcuts</span>
+      </button>
+    </div>
+  </div>
+  <nav aria-label="Lab modules">
+    <div role="tablist" aria-label="Lab modules" id="mainTabs">
+      <button role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true" data-hash="overview" tabindex="0">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>
+        Overview
+      </button>
+      <button role="tab" id="tab-keyboard" aria-controls="panel-keyboard" aria-selected="false" data-hash="keyboard" tabindex="-1">
+        <span class="tab-num" aria-hidden="true">1</span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></svg>
+        Keyboard &amp; ARIA
+      </button>
+      <button role="tab" id="tab-contrast" aria-controls="panel-contrast" aria-selected="false" data-hash="contrast" tabindex="-1">
+        <span class="tab-num" aria-hidden="true">2</span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+        Contrast &amp; zoom
+      </button>
+      <button role="tab" id="tab-workshop" aria-controls="panel-workshop" aria-selected="false" data-hash="workshop" tabindex="-1">
+        <span class="tab-num" aria-hidden="true">3</span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14.5 6.5a4.5 4.5 0 0 0-6 5.7L3 17.7V21h3.3l5.5-5.5a4.5 4.5 0 0 0 5.7-6L14.5 12.5l-3-3 3-3z" stroke-linejoin="round"/></svg>
+        Fix the UI
+      </button>
+      <button role="tab" id="tab-audit" aria-controls="panel-audit" aria-selected="false" data-hash="audit" tabindex="-1">
+        <span class="tab-num" aria-hidden="true">4</span>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2h6v4H9z"/><path d="M9 13.5l2 2 4-4"/></svg>
+        Audit report
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+<!-- ================= Module: Overview ================= -->
+<section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
+  <div class="hero">
+    <svg class="hero-mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false">
+      <rect x="2" y="2" width="44" height="44" rx="12"/>
+      <circle cx="24" cy="13.5" r="4" fill="currentColor" stroke="none"/>
+      <path d="M11 21c4.3 2.2 8.6 3.3 13 3.3S32.7 23.2 37 21" stroke-linecap="round"/>
+      <path d="M24 24.5V32" stroke-linecap="round"/>
+      <path d="M24 32l-7 10M24 32l7 10" stroke-linecap="round"/>
+    </svg>
+    <h1>Forge inclusive interfaces.</h1>
+    <p class="hero-lead">Practice keyboard and screen reader support, test contrast and magnification, fix a broken UI, and produce a shareable audit — all against WCAG 2.1 AA.</p>
+    <div class="hero-chips">
+      <span class="badge badge-info">WCAG 2.1 · 18 tracked criteria</span>
+      <span class="badge badge-info">14 planted defects to hunt</span>
+      <span class="badge badge-info">Zero dependencies</span>
+      <span class="badge badge-info">Works offline</span>
+    </div>
+  </div>
+
+  <h2>Your progress</h2>
+  <div class="grid grid-2" style="margin-bottom:var(--sp-6)">
+    <div class="stat">
+      <span class="stat-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Issues found
+      </span>
+      <span class="stat-value" id="ov-found">0 / 14</span>
+      <div class="meter-track"><div class="meter-fill" id="ov-found-fill" style="width:0%"></div></div>
+      <span class="stat-sub">Module 3 · remediation workshop</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 12.5l5 5L20 6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Issues fixed
+      </span>
+      <span class="stat-value" id="ov-fixed">0 / 14</span>
+      <div class="meter-track"><div class="meter-fill" id="ov-fixed-fill" style="width:0%"></div></div>
+      <span class="stat-sub">Module 3 · remediation workshop</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2h6v4H9z"/><path d="M9 13.5l2 2 4-4"/></svg>
+        Checklist rated
+      </span>
+      <span class="stat-value" id="ov-rated">0 / 18</span>
+      <div class="meter-track"><div class="meter-fill" id="ov-rated-fill" style="width:0%"></div></div>
+      <span class="stat-sub">Module 4 · audit report</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+        Contrast pairs saved
+      </span>
+      <span class="stat-value" id="ov-pairs">0</span>
+      <div class="meter-track"><div class="meter-fill" id="ov-pairs-fill" style="width:0%"></div></div>
+      <span class="stat-sub">Module 2 · contrast checker</span>
+    </div>
+  </div>
+
+  <h2>Quick start</h2>
+  <ol class="steps" style="margin-bottom:var(--sp-8)">
+    <li><div><strong>Learn the patterns.</strong><p style="margin:.25rem 0 0;color:var(--muted)">Work through the Keyboard &amp; ARIA lab using only Tab, arrows, Enter, Space and Esc.</p></div></li>
+    <li><div><strong>Measure things.</strong><p style="margin:.25rem 0 0;color:var(--muted)">Check color pairs with the WCAG contrast math, then simulate zoom, reflow and color vision deficiency.</p></div></li>
+    <li><div><strong>Fix a broken UI.</strong><p style="margin:.25rem 0 0;color:var(--muted)">Hunt the 14 planted WCAG failures in the “Before” storefront and compare with the fixed “After”.</p></div></li>
+    <li><div><strong>Report it.</strong><p style="margin:.25rem 0 0;color:var(--muted)">Rate the checklist, then generate, print or export your audit as text, Markdown or JSON.</p></div></li>
+  </ol>
+
+  <h2>Jump into a module</h2>
+  <div class="quick-nav" style="margin-bottom:var(--sp-8)">
+    <a class="quick-card" href="#keyboard" data-goto="keyboard">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></svg>
+      <span class="quick-title" style="font-size:var(--fs-lg);font-weight:700">1 · Keyboard &amp; ARIA</span>
+      <p>Tabs, accordion, dialog, menu, form validation, a toggle switch and a live key log.</p>
+      <span class="quick-go">Open module →</span>
+    </a>
+    <a class="quick-card" href="#contrast" data-goto="contrast">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+      <span class="quick-title" style="font-size:var(--fs-lg);font-weight:700">2 · Contrast &amp; zoom</span>
+      <p>Exact WCAG contrast math with fix suggestions, plus magnification, reflow and color-vision filters.</p>
+      <span class="quick-go">Open module →</span>
+    </a>
+    <a class="quick-card" href="#workshop" data-goto="workshop">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14.5 6.5a4.5 4.5 0 0 0-6 5.7L3 17.7V21h3.3l5.5-5.5a4.5 4.5 0 0 0 5.7-6L14.5 12.5l-3-3 3-3z" stroke-linejoin="round"/></svg>
+      <span class="quick-title" style="font-size:var(--fs-lg);font-weight:700">3 · Fix the UI</span>
+      <p>A broken storefront with 14 failures, side-by-side with the fixed version. Track what you find.</p>
+      <span class="quick-go">Open module →</span>
+    </a>
+    <a class="quick-card" href="#audit" data-goto="audit">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 2h6v4H9z"/><path d="M9 13.5l2 2 4-4"/></svg>
+      <span class="quick-title" style="font-size:var(--fs-lg);font-weight:700">4 · Audit report</span>
+      <p>Rate 18 tracked success criteria, keep notes, then export the audit as text, Markdown or JSON.</p>
+      <span class="quick-go">Open module →</span>
+    </a>
+  </div>
+
+  <h2>WCAG 2.1 at a glance — the four POUR principles</h2>
+  <div class="grid grid-2">
+    <div class="card pour-card">
+      <div class="row"><span class="pour-letter" aria-hidden="true">P</span><div><h3 style="margin:0;font-size:var(--fs-lg)">Perceivable</h3></div></div>
+      <p>Information and UI components must be presentable to users in ways they can perceive — text alternatives, captions, contrast, multiple ways to consume content.</p>
+      <span class="pour-count" id="pour-count-Perceivable"></span>
+    </div>
+    <div class="card pour-card">
+      <div class="row"><span class="pour-letter" aria-hidden="true">O</span><div><h3 style="margin:0;font-size:var(--fs-lg)">Operable</h3></div></div>
+      <p>UI components and navigation must be usable by everyone — full keyboard support, no traps, enough time, ways to navigate and to reduce motion.</p>
+      <span class="pour-count" id="pour-count-Operable"></span>
+    </div>
+    <div class="card pour-card">
+      <div class="row"><span class="pour-letter" aria-hidden="true">U</span><div><h3 style="margin:0;font-size:var(--fs-lg)">Understandable</h3></div></div>
+      <p>Content and operation must be understandable — predictable behavior, help with input, clear errors, and a declared page language.</p>
+      <span class="pour-count" id="pour-count-Understandable"></span>
+    </div>
+    <div class="card pour-card">
+      <div class="row"><span class="pour-letter" aria-hidden="true">R</span><div><h3 style="margin:0;font-size:var(--fs-lg)">Robust</h3></div></div>
+      <p>Content must be robust enough to work with current and future assistive technologies — correct names, roles, values and status messages.</p>
+      <span class="pour-count" id="pour-count-Robust"></span>
+    </div>
+  </div>
+
+  <div class="card card-accent" style="margin-top:var(--sp-8);border-color:var(--bad)">
+    <h3 style="margin-top:0">Danger zone</h3>
+    <p>Progress is saved automatically in this browser (found/fixed issues, checklist ratings, notes, saved color pairs and your theme choice).</p>
+    <button type="button" class="btn btn-danger" id="resetProgressBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>
+      Reset all progress
+    </button>
+  </div>
+</section>
+
+<!-- ================= Module 1: Keyboard & ARIA ================= -->
+<section role="tabpanel" id="panel-keyboard" aria-labelledby="tab-keyboard" hidden>
+  <div class="panel-head">
+    <div>
+      <h2>Keyboard and screen reader lab</h2>
+      <p>Use only the keyboard here. Each card lists what to test and the ARIA it uses. Prefer native HTML; ARIA fills the gaps native elements cannot.</p>
+    </div>
+    <span class="badge badge-info">SC 2.1.1 · 2.4.3 · 4.1.2</span>
+  </div>
+
+  <div class="kbd-demo-grid">
+
+    <div class="card">
+      <div class="card-title-row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>
+        <h3 style="margin:0">Tabs</h3>
+      </div>
+      <p class="card-facts"><strong>Test:</strong> Tab to the module tabs in the header, then use <kbd>Left</kbd>, <kbd>Right</kbd>, <kbd>Home</kbd> and <kbd>End</kbd>. <strong>ARIA:</strong> tablist, tab, tabpanel, aria-selected, aria-controls, roving tabindex.</p>
+      <p>The five tabs above are the demo — one single Tab stop for the whole bar, arrows moving inside it, automatic activation. Deep links work too: every module has its own URL hash.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/></svg>
+        <h3 style="margin:0">Accordion</h3>
+      </div>
+      <p class="card-facts"><strong>Test:</strong> Enter or Space on a heading button. <strong>ARIA:</strong> aria-expanded, aria-controls.</p>
+      <div class="acc">
+        <button type="button" class="acc-trigger" id="ah1" aria-expanded="false" aria-controls="ap1">
+          What is a focus indicator?
+          <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="ap1" class="acc-panel" role="region" aria-labelledby="ah1" hidden>
+          <p>The outline that shows where keyboard focus is (SC 2.4.7). AccessiForge draws a 3px focus ring on every interactive element — try tabbing to see it.</p>
+        </div>
+        <button type="button" class="acc-trigger" id="ah2" aria-expanded="false" aria-controls="ap2">
+          Why use a real button?
+          <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="ap2" class="acc-panel" role="region" aria-labelledby="ah2" hidden>
+          <p>Buttons get focus, Enter, Space and a role for free (SC 2.1.1, 4.1.2). A styled <code>&lt;div&gt;</code> gets none of them.</p>
+        </div>
+        <button type="button" class="acc-trigger" id="ah3" aria-expanded="false" aria-controls="ap3">
+          What is a roving tabindex?
+          <svg class="acc-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="ap3" class="acc-panel" role="region" aria-labelledby="ah3" hidden>
+          <p>Only one item in a composite widget (like the tabs above) keeps <code>tabindex="0"</code>; the rest are <code>-1</code>. Tab enters and leaves the group once, while arrows move inside it.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
+        <h3 style="margin:0">Modal dialog</h3>
+      </div>
+      <p class="card-facts"><strong>Test:</strong> Open it, press Tab (focus stays inside), press Esc (focus returns here). <strong>ARIA:</strong> native dialog with showModal() supplies the modal role, focus trap and Esc; aria-labelledby and aria-describedby name it.</p>
+      <button type="button" class="btn btn-primary" id="openDialogBtn">Open dialog</button>
+      <dialog id="demoDialog" aria-labelledby="dt" aria-describedby="dd">
+        <h3 class="dialog-title" id="dt">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
+          Confirm
+        </h3>
+        <p id="dd">Focus is trapped in this dialog until you close it. Press <kbd>Esc</kbd> or choose a button.</p>
+        <div class="dialog-actions">
+          <button type="button" id="otherControl" class="btn btn-secondary">Another control</button>
+          <button type="button" class="btn btn-primary" id="closeDialogBtn">Close</button>
+        </div>
+      </dialog>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h10M4 18h7" stroke-linecap="round"/><path d="M18 15l3 3-3 3"/></svg>
+        <h3 style="margin:0">Menu button</h3>
+      </div>
+      <p class="card-facts"><strong>Test:</strong> Enter or Down Arrow opens; Up, Down, Home, End move; Esc closes and returns focus. <strong>ARIA:</strong> aria-haspopup, aria-expanded, menu, menuitem.</p>
+      <div class="menu-anchor">
+        <button type="button" id="menuBtn" class="btn btn-secondary" aria-haspopup="menu" aria-expanded="false" aria-controls="menuList">Actions</button>
+        <div id="menuList" class="menu" role="menu" aria-labelledby="menuBtn" hidden>
+          <button type="button" role="menuitem" tabindex="-1">Copy</button>
+          <button type="button" role="menuitem" tabindex="-1">Rename</button>
+          <button type="button" role="menuitem" tabindex="-1">Delete</button>
+        </div>
+      </div>
+      <p style="margin-top:var(--sp-3);font-size:var(--fs-sm);color:var(--muted)">Choosing an item announces it through a status message — no focus jump, no page change.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 12v3a5 5 0 0 0 5 5h6a5 5 0 0 0 5-5v-3"/><path d="M8 12V5M16 12V5"/></svg>
+        <h3 style="margin:0">Toggle switch</h3>
+      </div>
+      <p class="card-facts"><strong>Test:</strong> Enter or Space toggles; screen readers announce “on/off”. <strong>ARIA:</strong> role="switch" with aria-checked.</p>
+      <button type="button" class="switch" id="switchDemo" role="switch" aria-checked="false">
+        <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+        <span class="switch-label">Enhanced brewing</span>
+      </button>
+      <p class="demo-status" id="switchState" role="status">Announced: “Enhanced brewing, off”</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title-row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 15.4l-4.8 2.5.9-5.4L4.2 8.7l5.4-.8z"/></svg>
+        <h3 style="margin:0">Form with validation</h3>
+      </div>
+      <p class="card-facts"><strong>Test:</strong> Submit empty. Focus moves to the error summary; each link jumps to its field. <strong>ARIA:</strong> aria-required, aria-invalid, aria-describedby, role=status.</p>
+      <div id="errorSummary" class="error-summary" tabindex="-1" hidden></div>
+      <form id="demoForm" novalidate>
+        <div class="field">
+          <label for="fname">Name (required)</label>
+          <input id="fname" type="text" aria-required="true" aria-describedby="fname-err" autocomplete="name">
+          <div id="fname-err" class="err"></div>
+        </div>
+        <div class="field">
+          <label for="femail">Email (required)</label>
+          <input id="femail" type="email" aria-required="true" aria-describedby="femail-err" autocomplete="email">
+          <div id="femail-err" class="err"></div>
+        </div>
+        <div class="field">
+          <label for="fmsg">Tasting notes (optional)</label>
+          <input id="fmsg" type="text" aria-describedby="fmsg-hint">
+          <p class="field-hint" id="fmsg-hint">Anything you noticed — flavor, body, roast level.</p>
+        </div>
+        <button type="submit" class="btn btn-primary">Send</button>
+      </form>
+    </div>
+
+  </div>
+
+  <div class="card" style="margin-top:var(--sp-4)">
+    <div class="card-title-row">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></svg>
+      <h3 style="margin:0">Keyboard event log</h3>
+    </div>
+    <p>Shows each key and the focused element, so you can check focus order (SC 2.4.3). It also powers the deliberate keyboard trap in the “Before” samples of modules 2 and 3 — press <kbd>Esc</kbd> to escape it.</p>
+    <div class="row" style="margin-bottom:var(--sp-3)">
+      <button type="button" class="btn btn-secondary btn-sm" id="pauseKeyLog" aria-pressed="false">Pause log</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="clearKeyLog">Clear log</button>
+    </div>
+    <ol id="keyLog" class="keylog" aria-label="Recent key events">
+      <li><span class="k-target" style="padding:.35rem .8rem;display:block">Press keys anywhere on this page — the newest event appears here.</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= Module 2: Contrast & zoom ================= -->
+<section role="tabpanel" id="panel-contrast" aria-labelledby="tab-contrast" hidden>
+  <div class="panel-head">
+    <div>
+      <h2>Contrast and magnification tester</h2>
+      <p>Exact WCAG 2.x contrast math with a hue-preserving fixer, plus a magnification stage with reflow, text-spacing and color vision simulation.</p>
+    </div>
+    <span class="badge badge-info">SC 1.4.3 · 1.4.4 · 1.4.10 · 1.4.11 · 1.4.12</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title-row">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>
+      <h3 style="margin:0">Contrast checker</h3>
+    </div>
+    <div class="contrast-grid">
+      <div>
+        <div class="field">
+          <label for="fgPicker">Text color</label>
+          <div class="row">
+            <input type="color" id="fgPicker" value="#767676">
+            <input type="text" id="fgHex" class="hex-input" value="#767676" aria-label="Text color hex">
+          </div>
+        </div>
+        <div class="field">
+          <label for="bgPicker">Background color</label>
+          <div class="row">
+            <input type="color" id="bgPicker" value="#ffffff">
+            <input type="text" id="bgHex" class="hex-input" value="#ffffff" aria-label="Background color hex">
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn-secondary btn-sm" id="swapBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M7 4v13M7 17l-3-3M7 17l3-3M17 20V7M17 7l-3 3M17 7l3 3"/></svg>
+            Swap
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="suggestBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 4 10.5c-.7.6-1 1.4-1 2.5h-6c0-1.1-.3-1.9-1-2.5A6 6 0 0 1 12 3z"/></svg>
+            Suggest a passing text color (4.5:1)
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="savePairBtn">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
+            Save pair
+          </button>
+        </div>
+        <p style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--sp-3)">Large text means at least 24px regular or 18.66px bold. The suggestion blends your text color toward black or white until the target is met, which keeps the hue.</p>
+      </div>
+      <div>
+        <p class="ratio-display" style="margin-bottom:var(--sp-2)">
+          <span id="ratioValue" class="ratio-value">4.54</span><span class="ratio-unit">:1</span>
+          <span style="font-size:var(--fs-sm);color:var(--muted)">(shown rounded down, never up)</span>
+        </p>
+        <ul id="testResults" class="test-list"></ul>
+        <div class="pv preview-box" id="previewBox">
+          <p style="margin:0;font-size:1rem">Normal text sample</p>
+          <p style="margin:0;font-size:1.5rem">Large text sample (24px)</p>
+          <p style="margin:0;font-size:1.167rem;font-weight:700">Large bold sample (18.66px bold)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title-row">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 5h9l5 5v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8 12h8M8 16h5"/></svg>
+      <h3 style="margin:0">Saved pairs</h3>
+    </div>
+    <p style="font-size:var(--fs-sm);color:var(--muted)">Click a chip to reload that pair. Saved in this browser, newest first (max 8).</p>
+    <div id="pairHistory" class="pair-history"></div>
+    <div class="row" style="margin-top:var(--sp-3)">
+      <button type="button" class="btn btn-ghost btn-sm" id="clearHistoryBtn">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>
+        Clear saved pairs
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title-row">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M14.5 14.5L21 21M8 11h6M11 8v6"/></svg>
+      <h3 style="margin:0">Magnification, reflow and color vision</h3>
+    </div>
+    <div class="row" style="margin-bottom:var(--sp-2)">
+      <div class="field" style="margin:0">
+        <label for="sampleVer">Sample</label>
+        <select id="sampleVer">
+          <option value="g">After (fixed)</option>
+          <option value="b">Before (broken)</option>
+        </select>
+      </div>
+      <div class="field" style="margin:0;min-width:14rem">
+        <label for="zoomRange">Text size — <output id="zoomOut" for="zoomRange">100%</output></label>
+        <input type="range" id="zoomRange" min="100" max="400" step="25" value="100">
+      </div>
+      <div class="field" style="margin:0">
+        <label for="cvdSelect">Color vision</label>
+        <select id="cvdSelect">
+          <option value="">Normal</option>
+          <option value="pro">Protanopia</option>
+          <option value="deu">Deuteranopia</option>
+          <option value="tri">Tritanopia</option>
+          <option value="ach">Achromatopsia</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:var(--sp-3)">
+      <label class="check-line"><input type="checkbox" id="reflowChk"> Reflow at 320px (SC 1.4.10)</label>
+      <label class="check-line"><input type="checkbox" id="spacingChk"> Text spacing (SC 1.4.12)</label>
+    </div>
+    <p id="magStatus" class="demo-status" role="status"></p>
+    <div class="stage-wrap"><div id="stage"></div></div>
+    <p style="margin-top:var(--sp-3);font-size:var(--fs-sm);color:var(--muted)">SC 1.4.4 asks that text resize to 200% without loss of content or function. This is a simulation: also test with browser zoom, the OS magnifier, and a screen reader such as NVDA, JAWS or VoiceOver.</p>
+  </div>
+</section>
+
+<!-- ================= Module 3: Fix the UI ================= -->
+<section role="tabpanel" id="panel-workshop" aria-labelledby="tab-workshop" hidden>
+  <div class="panel-head">
+    <div>
+      <h2>WCAG 2.1 remediation workshop</h2>
+      <p>The “Before” storefront plants 14 real failures. Find them with the keyboard, the contrast checker and the filters, then mark each one Found and Fixed. Your progress is saved.</p>
+    </div>
+    <span class="badge badge-info">14 issues · Level A + AA</span>
+  </div>
+
+  <fieldset>
+    <legend>View</legend>
+    <label class="radio-line"><input type="radio" name="wsView" value="b" checked> Before</label>
+    <label class="radio-line"><input type="radio" name="wsView" value="a"> After</label>
+    <label class="radio-line"><input type="radio" name="wsView" value="s"> Side by side</label>
+  </fieldset>
+
+  <div class="compare-grid">
+    <div id="colBefore">
+      <p class="compare-label" id="lblBefore">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        Before — 14 failures
+      </p>
+      <div id="wrapBefore" class="stage-wrap"></div>
+    </div>
+    <div id="colAfter" hidden>
+      <p class="compare-label" id="lblAfter">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" focusable="false"><path d="M4 12.5l5 5L20 6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        After — fixed
+      </p>
+      <div id="wrapAfter" class="stage-wrap"></div>
+    </div>
+  </div>
+
+  <div style="margin-top:var(--sp-6)">
+    <div class="row" style="justify-content:space-between">
+      <h3 style="margin:0" id="wsProgressText">0 of 14 issues found</h3>
+      <span class="sr-only" id="wsProgressLabel" aria-live="polite">0 of 14 issues found</span>
+    </div>
+    <progress class="progress" id="wsProgressBar" max="14" value="0" style="margin-top:var(--sp-2)" aria-labelledby="wsProgressText"></progress>
+  </div>
+
+  <div class="filter-bar" id="wsFilters" role="group" aria-label="Filter issues">
+    <button type="button" class="chip" data-filter="all" aria-pressed="true">All 14</button>
+    <button type="button" class="chip" data-filter="todo" aria-pressed="false">Still to find</button>
+    <button type="button" class="chip" data-filter="found" aria-pressed="false">Found, not fixed</button>
+    <button type="button" class="chip" data-filter="fixed" aria-pressed="false">Fixed</button>
+  </div>
+
+  <div id="issueList"></div>
+  <p id="noMatch" class="empty-state" hidden>No issues match this filter — try another one.</p>
+</section>
+
+<!-- ================= Module 4: Audit report ================= -->
+<section role="tabpanel" id="panel-audit" aria-labelledby="tab-audit" hidden>
+  <div class="panel-head">
+    <div>
+      <h2>Audit report and checklist</h2>
+      <p>Rate 18 tracked WCAG 2.1 success criteria, keep notes per criterion, then generate a report as text, Markdown or JSON — or print it.</p>
+    </div>
+    <span class="badge badge-info">POUR · 18 criteria</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title-row">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01" stroke-linecap="round"/></svg>
+      <h3 style="margin:0">How to test</h3>
+    </div>
+    <p>Keyboard only: Tab, Shift+Tab, Enter, Space, arrows, Esc. Screen readers: NVDA with Firefox or Chrome, VoiceOver with Safari, TalkBack on Android. Also check zoom to 200%, contrast tools, and automated scanners (axe DevTools, Lighthouse, WAVE). Automated tools find only a portion of WCAG issues, so manual testing is required.</p>
+  </div>
+
+  <h3>Score by principle</h3>
+  <div class="audit-summary">
+    <div class="stat principle-stat">
+      <div class="row"><span class="p-name">Perceivable</span><span class="p-score" id="ps-score-Perceivable"></span></div>
+      <div class="meter-track"><div class="meter-fill" id="ps-fill-Perceivable" style="width:0%"></div></div>
+    </div>
+    <div class="stat principle-stat">
+      <div class="row"><span class="p-name">Operable</span><span class="p-score" id="ps-score-Operable"></span></div>
+      <div class="meter-track"><div class="meter-fill" id="ps-fill-Operable" style="width:0%"></div></div>
+    </div>
+    <div class="stat principle-stat">
+      <div class="row"><span class="p-name">Understandable</span><span class="p-score" id="ps-score-Understandable"></span></div>
+      <div class="meter-track"><div class="meter-fill" id="ps-fill-Understandable" style="width:0%"></div></div>
+    </div>
+    <div class="stat principle-stat">
+      <div class="row"><span class="p-name">Robust</span><span class="p-score" id="ps-score-Robust"></span></div>
+      <div class="meter-track"><div class="meter-fill" id="ps-fill-Robust" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div id="checklist"></div>
+
+  <div class="report-actions noprint">
+    <button type="button" class="btn btn-primary" id="genReportBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 3h14v18H5zM9 7h6M9 11h6M9 15h4"/></svg>
+      Generate report
+    </button>
+    <button type="button" class="btn btn-secondary" id="copyReportBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+      Copy as text
+    </button>
+    <button type="button" class="btn btn-secondary" id="downloadMdBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"/></svg>
+      Download Markdown
+    </button>
+    <button type="button" class="btn btn-secondary" id="exportJsonBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg>
+      Export JSON
+    </button>
+    <button type="button" class="btn btn-secondary" id="importJsonBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 15V3M12 3L8 7M12 3l4 4M4 19h16"/></svg>
+      Import JSON
+    </button>
+    <input type="file" id="importJsonFile" accept=".json,application/json" class="sr-only" aria-label="Import audit JSON file" tabindex="-1">
+    <button type="button" class="btn btn-secondary" id="printBtn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M7 8V3h10v5M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3"/><rect x="7" y="14" width="10" height="7"/></svg>
+      Print
+    </button>
+  </div>
+
+  <pre id="reportOut" class="report-out" tabindex="-1" aria-live="off">Choose “Generate report” to build a summary.</pre>
+  <p id="copyStatus" role="status" style="min-height:1.6rem;color:var(--muted);font-size:var(--fs-sm)"></p>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>Limits: this lab cannot replace testing with real assistive technology, and its scanners check only what they can compute. Verify with NVDA, JAWS, VoiceOver, TalkBack, real browser zoom and real people.</p>
+    <p>AccessiForge <span id="year">2026</span> · zero dependencies · works offline · MIT licensed.</p>
+  </div>
+</footer>
+
+<!-- ================= Dialogs ================= -->
+<dialog id="helpDialog" aria-labelledby="helpTitle">
+  <h3 class="dialog-title" id="helpTitle">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></svg>
+    Keyboard shortcuts
+  </h3>
+  <table class="data-table">
+    <caption class="sr-only">Application keyboard shortcuts</caption>
+    <thead><tr><th scope="col">Keys</th><th scope="col">Action</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>Alt</kbd> + <kbd>1</kbd>…<kbd>5</kbd></td><td>Jump to a module</td></tr>
+      <tr><td><kbd>Alt</kbd> + <kbd>T</kbd></td><td>Cycle theme (light → dark → high contrast)</td></tr>
+      <tr><td><kbd>?</kbd></td><td>Open this help</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>Close dialogs; escape the demo keyboard trap</td></tr>
+      <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd></td><td>Move between controls</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:var(--fs-sm);color:var(--muted)">Inside the module tabs: <kbd>Left</kbd>/<kbd>Right</kbd>/<kbd>Home</kbd>/<kbd>End</kbd> switch modules.</p>
+  <div class="dialog-actions">
+    <button type="button" class="btn btn-primary" id="helpCloseBtn">Close</button>
+  </div>
+</dialog>
+
+<dialog id="resetDialog" aria-labelledby="resetTitle" aria-describedby="resetDesc">
+  <h3 class="dialog-title" id="resetTitle">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3l10 17H2z" stroke-linejoin="round"/><path d="M12 10v5M12 18v.01" stroke-linecap="round"/></svg>
+    Reset all progress?
+  </h3>
+  <p id="resetDesc">This clears found/fixed issues, checklist ratings and notes, saved color pairs and your theme choice from this browser. It cannot be undone.</p>
+  <div class="dialog-actions">
+    <button type="button" class="btn btn-secondary" id="resetCancelBtn">Cancel</button>
+    <button type="button" class="btn btn-danger" id="resetConfirmBtn">Yes, reset everything</button>
+  </div>
+</dialog>
+
+<!-- Color vision deficiency filters, applied to the sample with CSS filter:url().
+     Kept inline because external SVG filters are blocked from file:// in some browsers. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<filter id="cvd-pro"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"/></filter>
+<filter id="cvd-deu"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"/></filter>
+<filter id="cvd-tri"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"/></filter>
+<filter id="cvd-ach"><feColorMatrix type="matrix" values="0.299 0.587 0.114 0 0 0.299 0.587 0.114 0 0 0.299 0.587 0.114 0 0 0 0 0 1 0"/></filter>
+</defs></svg>
+
+<noscript>
+  <p style="padding:1rem;background:#fff;color:#000">AccessiForge needs JavaScript to run its labs. Please enable it and reload.</p>
+</noscript>
+
+<!-- Load order matters: core services → data → feature modules → bootstrap -->
+<script src="js/core/dom.js"></script>
+<script src="js/core/store.js"></script>
+<script src="js/core/announce.js"></script>
+<script src="js/core/theme.js"></script>
+<script src="js/core/tabs.js"></script>
+<script src="js/core/shortcuts.js"></script>
+<script src="js/data/issues.js"></script>
+<script src="js/data/checklist.js"></script>
+<script src="js/data/sample.js"></script>
+<script src="js/modules/overview.js"></script>
+<script src="js/modules/keyboard-lab.js"></script>
+<script src="js/modules/contrast.js"></script>
+<script src="js/modules/magnify.js"></script>
+<script src="js/modules/workshop.js"></script>
+<script src="js/modules/audit.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
